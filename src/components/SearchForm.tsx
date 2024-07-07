@@ -1,10 +1,21 @@
-import { Component } from 'react';
+import { ChangeEvent, Component, FormEvent } from 'react';
 
-export default class SearchForm extends Component {
+type SearchProps = {
+  searchHandler: (event: ChangeEvent<HTMLInputElement>) => void;
+  submitForm: (event: FormEvent) => void;
+  searchValue: string;
+};
+
+export default class SearchForm extends Component<SearchProps> {
   render() {
     return (
-      <form>
-        <input type="search" placeholder="search" />
+      <form onSubmit={this.props.submitForm}>
+        <input
+          type="search"
+          placeholder="search"
+          onChange={this.props.searchHandler}
+          value={this.props.searchValue}
+        />
         <button type="submit">Search</button>
       </form>
     );
