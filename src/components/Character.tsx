@@ -1,4 +1,3 @@
-// import React from "react";
 import { Component } from 'react';
 import { Character as CharacterType } from '../types/characters.types';
 import CardProperty from './CardProperty';
@@ -19,7 +18,6 @@ export default class Character extends Component<CharacterProps> {
           />
         </div>
         <div className="flex-[3_1_0] p-[0.75rem]">
-          {/* <p>{character.status} - {character.species}</p> */}
           <CardTitle
             name={this.props.character.name}
             species={this.props.character.species}

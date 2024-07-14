@@ -18,4 +18,3 @@ export default class Characters extends Component<Props> {
     );
   }
 }
-// rfc
