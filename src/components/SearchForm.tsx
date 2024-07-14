@@ -15,8 +15,11 @@ export default class SearchForm extends Component<SearchProps> {
           placeholder="search"
           onChange={this.props.searchHandler}
           value={this.props.searchValue}
+          className="border border-blue-400"
         />
-        <button type="submit">Search</button>
+        <button type="submit" className="rounded bg-blue-400 p-2">
+          Search
+        </button>
       </form>
     );
   }
