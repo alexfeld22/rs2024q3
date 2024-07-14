@@ -67,8 +67,10 @@ function App() {
         <ErrorBoundaryForm />
       </div>
       <div className="flex items-center justify-center bg-[#272B33] px-1 sm:px-6">
-        {loader && <h2>Loadind...</h2>}
-        {!loader && !cards?.length && <h2>No data to display</h2>}
+        {loader && <h2 className="text-white">Loadind...</h2>}
+        {!loader && !cards?.length && (
+          <h2 className="text-white">No data to display</h2>
+        )}
         {!loader && cards?.length > 0 && <Characters characters={cards} />}
       </div>
     </div>
