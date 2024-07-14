@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Characters from './components/Characters';
 import ErrorBoundaryForm from './components/ErrorBoundaryForm';
 import SearchForm from './components/SearchForm';
+import useLocalStorage from './hooks/useLocalStorage';
 import { Character, Welcome } from './types/characters.types';
 
 const fetchData = async (query: string) => {
@@ -16,17 +17,14 @@ const fetchData = async (query: string) => {
 };
 
 function App() {
-  const [loader, setLoader] = useState<boolean>(false);
-  const [searchValue, setSearchValue] = useState<string>(
-    localStorage.getItem('searchValue') || ''
-  );
+  const [loader, setLoader] = useState(false);
+  const [searchValue, setSearchValue] = useLocalStorage();
   const [cards, setCards] = useState<Character[]>([]);
 
   const getCharacters = async (searchString: string) => {
     try {
       setLoader(true);
       let characters = await fetchData(searchString);
-      console.log(characters);
       if (!characters) characters = [];
       setCards(characters);
       setLoader(false);
@@ -42,13 +40,13 @@ function App() {
   }, []);
 
   const seachHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
     setSearchValue(event.target.value);
   };
 
   const submitForm = (event: FormEvent) => {
     event.preventDefault();
     getCharacters(searchValue);
-    localStorage.setItem('searchValue', searchValue);
   };
 
   return (

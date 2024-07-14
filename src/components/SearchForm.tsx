@@ -12,6 +12,7 @@ export default function SearchForm(props: SearchProps) {
       <input
         type="search"
         placeholder="search"
+        name="searchInput"
         onChange={props.searchHandler}
         value={props.searchValue}
         className="m-1 border border-blue-400 p-1"
