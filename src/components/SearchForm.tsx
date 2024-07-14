@@ -14,7 +14,7 @@ export default function SearchForm(props: SearchProps) {
         placeholder="search"
         onChange={props.searchHandler}
         value={props.searchValue}
-        className="border border-blue-400"
+        className="m-1 border border-blue-400 p-1"
       />
       <button type="submit" className="rounded bg-blue-400 p-2">
         Search

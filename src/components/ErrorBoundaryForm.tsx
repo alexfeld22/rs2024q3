@@ -8,7 +8,10 @@ export default function ErrorBoundaryForm() {
   }
   return (
     <div>
-      <button className="rounded bg-red-400 p-2" onClick={() => setError(true)}>
+      <button
+        className="m-1 rounded bg-red-400 p-1"
+        onClick={() => setError(true)}
+      >
         Throw an error!
       </button>
     </div>
