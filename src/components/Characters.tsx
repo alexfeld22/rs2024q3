@@ -1,4 +1,3 @@
-// import React from 'react'
 import { Component } from 'react';
 import { Character as CharacterType } from '../types/characters.types';
 import Character from './Character';

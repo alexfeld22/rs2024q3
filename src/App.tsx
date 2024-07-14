@@ -1,5 +1,6 @@
 import { ChangeEvent, Component, FormEvent } from 'react';
 import Characters from './components/Characters';
+import ErrorBoundaryForm from './components/ErrorBoundaryForm';
 import SearchForm from './components/SearchForm';
 import { Character, Welcome } from './types/characters.types';
 
@@ -61,6 +62,9 @@ class App extends Component {
             submitForm={this.submitForm}
             searchValue={this.state.searchValue}
           />
+        </div>
+        <div className="flex h-10 flex-col items-center justify-center">
+          <ErrorBoundaryForm children={undefined} />
         </div>
         <div className="flex items-center justify-center bg-[#272B33] px-1 sm:px-6">
           {this.state.loader && <h2>Loadind...</h2>}
