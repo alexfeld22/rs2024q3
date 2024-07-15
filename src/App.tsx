@@ -1,16 +1,16 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { baseCharacterUrl } from './assets/CONSTS';
 import Characters from './components/Characters';
 import ErrorBoundaryForm from './components/ErrorBoundaryForm';
+import Pagination from './components/Pagination';
 import SearchForm from './components/SearchForm';
 import useLocalStorage from './hooks/useLocalStorage';
-import { Character, Welcome } from './types/characters.types';
+import { Character } from './types/characters.types';
 
-const fetchData = async (query: string) => {
+const fetchCharacters = async (url: string) => {
   try {
-    const url = `https://rickandmortyapi.com/api/character/?name=${query}`;
     const response = await fetch(url);
-    const data: Welcome = await response.json();
-    return data.results;
+    return await response.json();
   } catch (error) {
     console.log('We have an error while fetching data: ', error);
   }
@@ -20,33 +20,45 @@ function App() {
   const [loader, setLoader] = useState(false);
   const [searchValue, setSearchValue] = useLocalStorage();
   const [cards, setCards] = useState<Character[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
-  const getCharacters = async (searchString: string) => {
+  const getCharacters = async (searchString: string, page: number) => {
+    setLoader(true);
     try {
-      setLoader(true);
-      let characters = await fetchData(searchString);
-      if (!characters) characters = [];
+      const url = baseCharacterUrl + `?name=${searchString}` + `&page=${page}`;
+      const data = await fetchCharacters(url);
+      const characters = data?.error ? [] : data.results;
+      const pagesNum = data?.error ? 1 : data.info.pages;
       setCards(characters);
+      setPages(pagesNum);
       setLoader(false);
     } catch (error) {
       console.error('Fetch Error: ', error);
       setLoader(false);
+      setCurrentPage(1);
+      setPages(1);
       setCards([]);
     }
   };
 
   useEffect(() => {
-    getCharacters(searchValue);
+    getCharacters(searchValue, currentPage);
   }, []);
 
   const seachHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
     setSearchValue(event.target.value);
   };
 
   const submitForm = (event: FormEvent) => {
     event.preventDefault();
-    getCharacters(searchValue);
+    setCurrentPage(1);
+    getCharacters(searchValue, currentPage);
+  };
+
+  const handlePagination = (num: number) => {
+    setCurrentPage(num);
+    getCharacters(searchValue, num);
   };
 
   return (
@@ -65,6 +77,13 @@ function App() {
       </div>
       <div className="flex h-10 flex-col items-center justify-center">
         <ErrorBoundaryForm />
+      </div>
+      <div>
+        <Pagination
+          currentPage={currentPage}
+          pages={pages}
+          handlePagination={handlePagination}
+        />
       </div>
       <div className="flex items-center justify-center bg-[#272B33] px-1 sm:px-6">
         {loader && <h2 className="text-white">Loadind...</h2>}

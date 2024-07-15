@@ -1,13 +1,14 @@
 export type Welcome = {
   info: Info;
   results: Character[];
+  error?: string;
 };
 
 export type Info = {
   count: number;
   pages: number;
   next: string;
-  prev: null;
+  prev: string;
 };
 
 export type Character = {
