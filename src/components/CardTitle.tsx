@@ -9,9 +9,13 @@ export default function CardTitle({ name, species, status }: Props) {
     <div>
       <h3>{name}</h3>
       <div>
-        <span className={status === 'Alive' ? 'icon-green' : 'icon-red'}>
-          icon
-        </span>
+        <div
+          className={
+            status === 'Alive'
+              ? 'h=[14px] mr-1 inline-block aspect-square w-[14px] shrink-0 grow-0 rounded-full bg-green-600'
+              : 'h=[14px] mr-1 inline-block aspect-square w-[14px] shrink-0 grow-0 rounded-full bg-red-400'
+          }
+        ></div>
         <span>
           {status} - {species}
         </span>
