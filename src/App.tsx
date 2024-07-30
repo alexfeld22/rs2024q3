@@ -1,83 +1,99 @@
-import { ChangeEvent, Component, FormEvent } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { baseCharacterUrl } from './assets/CONSTS';
 import Characters from './components/Characters';
 import ErrorBoundaryForm from './components/ErrorBoundaryForm';
+import Pagination from './components/Pagination';
 import SearchForm from './components/SearchForm';
-import { Character, Welcome } from './types/characters.types';
+import useLocalStorage from './hooks/useLocalStorage';
+import { Character } from './types/characters.types';
 
-const fetchData = async (query: string) => {
+const fetchCharacters = async (url: string) => {
   try {
-    const url = `https://rickandmortyapi.com/api/character/?name=${query}`;
     const response = await fetch(url);
-    const data: Welcome = await response.json();
-    return data.results;
+    return await response.json();
   } catch (error) {
-    console.log('We have an error: ', error);
+    console.log('We have an error while fetching data: ', error);
   }
 };
 
-type StateType = {
-  searchValue: string;
-  cards: Character[];
-  loader: boolean;
-};
+function App() {
+  const [loader, setLoader] = useState(false);
+  const [searchValue, setSearchValue] = useLocalStorage();
+  const [cards, setCards] = useState<Character[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
-class App extends Component {
-  state: StateType = {
-    searchValue: localStorage.getItem('searchValue') || '',
-    cards: [],
-    loader: false,
-  };
-  getCharacters = async () => {
+  const getCharacters = async (searchString: string, page: number) => {
+    setLoader(true);
     try {
-      this.setState({ loader: true });
-      const characters = await fetchData(this.state.searchValue);
-      this.setState({ cards: characters, loader: false });
+      const url = baseCharacterUrl + `?name=${searchString}` + `&page=${page}`;
+      const data = await fetchCharacters(url);
+      const characters = data?.error ? [] : data.results;
+      const pagesNum = data?.error ? 1 : data.info.pages;
+      setCards(characters);
+      setPages(pagesNum);
+      setLoader(false);
     } catch (error) {
       console.error('Fetch Error: ', error);
-      this.setState({ cards: [], loader: false });
+      setLoader(false);
+      setCurrentPage(1);
+      setPages(1);
+      setCards([]);
     }
   };
-  componentDidMount() {
-    this.getCharacters();
-  }
-  seachHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchValue: event.target.value });
+
+  useEffect(() => {
+    getCharacters(searchValue, currentPage);
+  }, []);
+
+  const seachHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
   };
-  submitForm = (event: FormEvent) => {
+
+  const submitForm = (event: FormEvent) => {
     event.preventDefault();
-    this.getCharacters();
-    localStorage.setItem('searchValue', this.state.searchValue);
+    setCurrentPage(1);
+    getCharacters(searchValue, currentPage);
   };
-  render() {
-    return (
-      <div>
-        <div className="flex h-[150px] w-full flex-col items-center justify-center dark:bg-black">
-          <h1 className="text-[5.625rem] font-black text-[#202329]">
-            Find your Morty
-          </h1>
-        </div>
-        <div className="flex h-10 flex-col items-center justify-center">
-          <SearchForm
-            searchHandler={this.seachHandler}
-            submitForm={this.submitForm}
-            searchValue={this.state.searchValue}
-          />
-        </div>
-        <div className="flex h-10 flex-col items-center justify-center">
-          <ErrorBoundaryForm children={undefined} />
-        </div>
-        <div className="flex items-center justify-center bg-[#272B33] px-1 sm:px-6">
-          {this.state.loader && <h2>Loadind...</h2>}
-          {!this.state.loader && !this.state.cards?.length && (
-            <h2>No data to display</h2>
-          )}
-          {!this.state.loader && this.state.cards?.length > 0 && (
-            <Characters characters={this.state.cards} />
-          )}
-        </div>
+
+  const handlePagination = (num: number) => {
+    setCurrentPage(num);
+    getCharacters(searchValue, num);
+  };
+
+  return (
+    <div>
+      <div className="flex h-[150px] w-full flex-col items-center justify-center dark:bg-black">
+        <h1 className="text-[5.625rem] font-black text-[#202329]">
+          Find your Morty
+        </h1>
       </div>
-    );
-  }
+      <div className="flex h-10 flex-col items-center justify-center">
+        <SearchForm
+          searchHandler={seachHandler}
+          submitForm={submitForm}
+          searchValue={searchValue}
+        />
+      </div>
+      <div className="flex h-10 flex-col items-center justify-center">
+        <ErrorBoundaryForm />
+      </div>
+      <div>
+        <Pagination
+          currentPage={currentPage}
+          pages={pages}
+          handlePagination={handlePagination}
+        />
+      </div>
+      <div className="flex items-center justify-center bg-[#272B33] px-1 sm:px-6">
+        {loader && <h2 className="text-white">Loadind...</h2>}
+        {!loader && !cards?.length && (
+          <h2 className="text-white">No data to display</h2>
+        )}
+        {!loader && cards?.length > 0 && <Characters characters={cards} />}
+      </div>
+    </div>
+  );
 }
 
 export default App;
